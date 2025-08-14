@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { supabase } from './supabaseClient';
 function App() {
   const [page, setPage] = useState("dashboard");
   const [records, setRecords] = useState([]);
@@ -76,26 +76,36 @@ function AddFilmShotForm({ onSave, onCancel }) {
   const [lighting, setLighting] = useState("");
   const [sound, setSound] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!scene || !shot || !description) {
-      alert("Please fill all required fields.");
-      return;
-    }
-    onSave({
-      scene,
-      storyboard,
-      shot,
-      description,
-      shotSize,
-      shotType: { angleType, framing, focus, dutchAngle },
-      subject,
-      movement,
-      equipment,
-      lighting,
-      sound,
-    });
-  };
+ async function handleSubmit(e) {
+  e.preventDefault();
+
+  const { error } = await supabase
+    .from('film_shots')
+    .insert([
+      {
+        scene,
+        storyboard_url: storyboardFileUrl, // You can upload to Supabase Storage
+        shot,
+        description,
+        shot_size,
+        angle_type,
+        framing,
+        focus,
+        dutch_angle,
+        subject,
+        movement,
+        equipment,
+        lighting,
+        sound
+      }
+    ]);
+
+  if (error) {
+    console.error(error);
+  } else {
+    alert('Shot saved!');
+  }
+}
 
   return (
     <div style={styles.formContainer}>
