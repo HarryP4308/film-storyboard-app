@@ -76,36 +76,65 @@ function AddFilmShotForm({ onSave, onCancel }) {
   const [lighting, setLighting] = useState("");
   const [sound, setSound] = useState("");
 
- async function handleSubmit(e) {
-  e.preventDefault();
+async function handleSubmit(e) {
+  e.preventDefault(); // Prevent form reload
 
-  const { error } = await supabase
-    .from('film_shots')
-    .insert([
-      {
-        scene,
-        storyboard_url: storyboardFileUrl, // You can upload to Supabase Storage
-        shot,
-        description,
-        shot_size,
-        angle_type,
-        framing,
-        focus,
-        dutch_angle,
-        subject,
-        movement,
-        equipment,
-        lighting,
-        sound
-      }
-    ]);
+  console.log("Save Shot button clicked ✅");
 
-  if (error) {
-    console.error(error);
-  } else {
-    alert('Shot saved!');
+  // Log all form state values
+  console.log("Form values:", {
+    scene,
+    storyboardFileUrl,
+    shot,
+    description,
+    shot_size,
+    angle_type,
+    framing,
+    focus,
+    dutch_angle,
+    subject,
+    movement,
+    equipment,
+    lighting,
+    sound
+  });
+
+  try {
+    const { data, error } = await supabase
+      .from('film_shots')
+      .insert([
+        {
+          scene,
+          storyboard_url: storyboardFileUrl,
+          shot,
+          description,
+          shot_size,
+          angle_type,
+          framing,
+          focus,
+          dutch_angle,
+          subject,
+          movement,
+          equipment,
+          lighting,
+          sound
+        }
+      ]);
+
+    console.log("Supabase insert result:", { data, error });
+
+    if (error) {
+      console.error("❌ Supabase error:", error);
+      alert(`Error saving shot: ${error.message}`);
+    } else {
+      alert("✅ Shot saved successfully!");
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    alert("Something went wrong. Check console.");
   }
 }
+
 
   return (
     <div style={styles.formContainer}>
